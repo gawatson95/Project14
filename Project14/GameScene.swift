@@ -11,6 +11,7 @@ import GameplayKit
 class GameScene: SKScene {
     var slots = [WhackSlot]()
     var gameScore: SKLabelNode!
+    var finalScore: SKLabelNode!
     
     var popupTime = 0.85
     var numRounds = 0
@@ -56,6 +57,11 @@ class GameScene: SKScene {
             if whackSlot.isHit { continue }
             whackSlot.hit()
             
+            if let smoke = SKEmitterNode(fileNamed: "Smoke") {
+                smoke.position = whackSlot.position
+                addChild(smoke)
+            }
+            
             if node.name == "charFriend" {
                 score -= 5
                 
@@ -81,15 +87,22 @@ class GameScene: SKScene {
     func createEnemy() {
         numRounds += 1
         
-        if numRounds >= 30 {
+        if numRounds >= 8 {
             for slot in slots {
                 slot.hide()
             }
             
+            run(SKAction.playSoundFileNamed("gameOver.wav", waitForCompletion: false))
             let gameOver = SKSpriteNode(imageNamed: "gameOver")
             gameOver.position = CGPoint(x: 512, y: 384)
             gameOver.zPosition = 1
             addChild(gameOver)
+            
+            finalScore = SKLabelNode(fontNamed: "Futura")
+            finalScore.text = "Final Score: \(score)"
+            finalScore.position = CGPoint(x: 512, y: 320)
+            finalScore.zPosition = 1
+            addChild(finalScore)
             return
         }
         
